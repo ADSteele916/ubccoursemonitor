@@ -1,4 +1,5 @@
 from django import forms
+
 from .models import Course, CourseTuple
 
 
@@ -20,3 +21,7 @@ class CourseTupleRegisterForm(forms.ModelForm):
     class Meta:
         model = CourseTuple
         fields = ['restricted']
+        labels = {
+            'restricted': 'Monitor for all seat openings (including restricted ones). Leave unchecked for general '
+                          'seats only.',
+        }

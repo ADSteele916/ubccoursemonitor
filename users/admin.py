@@ -1,6 +1,6 @@
 from django.contrib import admin
+
 from .models import Profile
-from courses.models import CourseTuple
 
 
 class CourseTupleInline(admin.StackedInline):

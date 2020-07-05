@@ -15,9 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
 
-from monitor import course_monitor, notifier
+from monitor import course_monitor
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,8 +24,5 @@ urlpatterns = [
     path('', include('courses.urls')),
 ]
 
-notifications = notifier.Notifier(settings.EMAIL_HOST_USER,
-                                  settings.EMAIL_HOST_PASSWORD,
-                                  settings.EMAIL_HOST,
-                                  settings.EMAIL_PORT)
-monitor = course_monitor.CourseMonitor(notifications, 1.0)
+
+monitor = course_monitor.CourseMonitor(1.0)

@@ -1,10 +1,13 @@
-from django.shortcuts import render, redirect
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+
+import ubccoursemonitor.urls
+from .forms import CourseRegisterForm, CourseTupleRegisterForm
 from .models import Course, CourseTuple
 from users.models import Profile
-from .forms import CourseRegisterForm, CourseTupleRegisterForm
-import ubccoursemonitor.urls
 
 
 def home(request):
@@ -54,7 +57,8 @@ def courses(request):
         return redirect('courses-list')
 
     else:
-        c_form = CourseRegisterForm()
+        default_year = str(datetime.now().year) if datetime.now().month >= 3 else str(datetime.now().year - 1)
+        c_form = CourseRegisterForm(initial={'year': default_year})
         ct_form = CourseTupleRegisterForm()
 
     user_courses = request.user.profile.courses.all()
