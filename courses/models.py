@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 
 from django.core.validators import RegexValidator
 from django.db import models
-from django.utils import timezone
 
 
 class Course(models.Model):
@@ -14,7 +13,7 @@ class Course(models.Model):
     subject = models.CharField(max_length=4, validators=[RegexValidator(regex="^[A-Z]{4}$")])
     number = models.CharField(max_length=5, validators=[RegexValidator(regex="^[A-Z0-9]{3,4}$")])
     section = models.CharField(max_length=5, validators=[RegexValidator(regex="^[A-Z0-9]{3,5}$")])
-    last_open = models.DateTimeField(blank=True, default=timezone.now)
+    last_open = models.DateTimeField(blank=True, null=True, default=None)
 
     def __str__(self):
         return f"{self.year}{self.session} {self.subject} {self.number} {self.section}"

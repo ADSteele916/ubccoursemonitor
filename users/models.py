@@ -17,6 +17,7 @@ class Profile(models.Model):
 
     def number_of_courses(self) -> int:
         return self.courses.count()
+
     number_of_courses.short_description = "Number of monitored courses"
 
 

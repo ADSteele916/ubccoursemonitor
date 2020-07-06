@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import datetime
 import os
 
 import django_heroku
@@ -139,3 +140,6 @@ EMAIL_HOST_PASSWORD = os.environ.get('UCM_DJANGO_EMAIL_PASS')
 
 if (os.environ.get('UCM_DJANGO_DEBUG_VALUE') != 'True') and (os.environ.get('UCM_DJANGO_DEBUG_VALUE') is not None):
     django_heroku.settings(locals())
+
+OPEN_COURSE_DELAY = datetime.timedelta(hours=24)
+MAX_POLL_FREQUENCY = 1.0
