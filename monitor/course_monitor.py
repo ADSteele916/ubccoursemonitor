@@ -18,7 +18,6 @@ class CourseMonitor:
     def __init__(self, frequency: float = 30.0) -> None:
 
         self.users = Profile.objects.all()
-        self.courses = Course.objects.all
 
         self.poll_frequency = max(frequency, settings.MAX_POLL_FREQUENCY)
         self.monitor_thread = threading.Thread(target=self.monitor_loop, daemon=True)
@@ -29,18 +28,21 @@ class CourseMonitor:
         while True:
             self.users = Profile.objects.all()
             to_remove = []
-            for course in self.courses():
+            for course in Course.objects.all().distinct():
                 if self.users.filter(courses__course=course).count() > 0:
                     if course.last_open is None or course.last_open + settings.OPEN_COURSE_DELAY < timezone.now():
-                        self.check_course(course)
+                        check = self.check_course(course)
+                        if check is not None:
+                            course.last_open = check
+                            course.save()
                     time.sleep(self.poll_frequency)
                 else:
                     to_remove.append(course)
             for course in to_remove:
                 course.delete()
-            time.sleep(self.poll_frequency * 5.0)
+            time.sleep(self.poll_frequency * 2.0)
 
-    def check_course(self, course: Course) -> bool:
+    def check_course(self, course: Course) -> datetime.datetime or None:
         """Checks an individual course for openings on behalf of a list of users and emails them if there is one."""
 
         def open_seats(seats: typing.Tuple[int, int, int, int]) -> str:
@@ -69,12 +71,11 @@ class CourseMonitor:
                 staff_in_list = to_notify.filter(user__is_staff=True)
                 if staff_in_list.count() > 0:
                     to_notify = staff_in_list
-                    course.last_open = timezone.now() - (settings.OPEN_COURSE_DELAY * 3 / 4)
+                    next_last_open = timezone.now() - (settings.OPEN_COURSE_DELAY * 3 / 4)
                 elif to_notify.filter(is_premium=True).count() > 0:
-                    course.last_open = timezone.now() - (settings.OPEN_COURSE_DELAY / 2)
+                    next_last_open = timezone.now() - (settings.OPEN_COURSE_DELAY / 2)
                 else:
-                    course.last_open = timezone.now()
-                course.save()
+                    next_last_open = timezone.now()
 
                 try:
                     subject = f"Check the SSC! Opening in {course}!"
@@ -98,16 +99,18 @@ class CourseMonitor:
                     recipients = recipients + "and " + str(to_notify[-1])
 
                 if notification is not None and notification > 0:
-                    print(f"{t}: Sent email about {course} to {recipients}.\n")
+                    print(f"{t}: Sent email about {course} to {recipients}.")
                 elif notification is None:
-                    print(f"{t}: Failed to send email about {course} to {recipients}.\n")
+                    print(f"{t}: Failed to send email about {course} to {recipients}.")
                 else:
-                    print(f"{t}: No users are monitoring {course} for {open_seats} seats.\n")
-                return True
+                    print(f"{t}: No users are monitoring {course} for {open_seats} seats.")
+                    return None
+
+                return next_last_open
 
             else:
-                print(f"{t}: No openings in {course}.\n")
-                return False
+                print(f"{t}: No openings in {course}.")
+                return None
         else:
-            print(f"{t}: Failed to check for open seats in {course}.\n")
-            return False
+            print(f"{t}: Failed to check for open seats in {course}.")
+            return None
