@@ -1,4 +1,20 @@
 {% extends "courses/base.html" %}
 {% block content %}
-    <h1>FAQ</h1>
+    <div class="content-section">
+        <h1>FAQ</h1>
+            {% for q, a in faq_elements.items %}
+            <div class="panel panel-default">
+                <div>
+                    <h4 class="panel-title">
+                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ q }}">{{ q }}</a>
+                    </h4>
+                </div>
+                <div id="collapse{{ q }}" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        {{ a }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock content %}
