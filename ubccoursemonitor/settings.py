@@ -31,7 +31,7 @@ DEBUG_PROPAGATE_EXCEPTIONS = True
 
 ADMINS = [(os.environ.get('UCM_DJANGO_ADMIN_NAME'), os.environ.get('UCM_DJANGO_ADMIN_EMAIL'))]
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ubccoursemonitor.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ubccoursemonitor.herokuapp.com', 'ubccoursemonitor.email']
 
 # Application definition
 

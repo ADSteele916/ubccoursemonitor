@@ -29,6 +29,7 @@ class CourseMonitor:
             self.users = Profile.objects.all()
             to_remove = []
             for course in Course.objects.all().distinct().iterator():
+                print(f"Iterated through {course}.")
                 if self.users.filter(courses__course=course).count() > 0:
                     if course.last_open is None or course.last_open + settings.OPEN_COURSE_DELAY < timezone.now():
                         check = self.check_course(course)
