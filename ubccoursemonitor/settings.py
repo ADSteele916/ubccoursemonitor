@@ -33,6 +33,9 @@ ADMINS = [(os.environ.get('UCM_DJANGO_ADMIN_NAME'), os.environ.get('UCM_DJANGO_A
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ubccoursemonitor.herokuapp.com', 'ubccoursemonitor.email']
 
+if (os.environ.get('UCM_DJANGO_DEBUG_VALUE') != 'True') and (os.environ.get('UCM_DJANGO_DEBUG_VALUE') is not None):
+    SECURE_SSL_REDIRECT = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -142,4 +145,4 @@ if (os.environ.get('UCM_DJANGO_DEBUG_VALUE') != 'True') and (os.environ.get('UCM
     django_heroku.settings(locals())
 
 OPEN_COURSE_DELAY = datetime.timedelta(hours=24)
-MAX_POLL_FREQUENCY = 1.0
+POLL_FREQUENCY = 1.0

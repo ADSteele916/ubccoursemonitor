@@ -25,4 +25,4 @@ urlpatterns = [
 ]
 
 
-monitor = course_monitor.CourseMonitor(1.0)
+monitor = course_monitor.CourseMonitor()

@@ -15,11 +15,10 @@ from users.models import Profile
 class CourseMonitor:
     """A class used to monitor courses for openings on behalf of a list of users."""
 
-    def __init__(self, frequency: float = 30.0) -> None:
+    def __init__(self) -> None:
 
         self.users = Profile.objects.all()
 
-        self.poll_frequency = max(frequency, settings.MAX_POLL_FREQUENCY)
         self.monitor_thread = threading.Thread(target=self.monitor_loop, daemon=True)
         self.monitor_thread.start()
 
@@ -36,12 +35,12 @@ class CourseMonitor:
                         if check is not None:
                             course.last_open = check
                             course.save()
-                    time.sleep(self.poll_frequency)
+                    time.sleep(settings.POLL_FREQUENCY)
                 else:
                     to_remove.append(course)
             for course in to_remove:
                 course.delete()
-            time.sleep(self.poll_frequency * 2.0)
+            time.sleep(settings.POLL_FREQUENCY * 2.0)
 
     def check_course(self, course: Course) -> datetime.datetime or None:
         """Checks an individual course for openings on behalf of a list of users and emails them if there is one."""
