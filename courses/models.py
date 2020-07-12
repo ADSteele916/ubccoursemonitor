@@ -7,12 +7,18 @@ from django.core.validators import RegexValidator
 from django.db import models
 
 
+year_validator = r"^\d{4}$"
+subject_validator = r"^[A-Z]{2,4}$"
+number_validator = r"^[A-Z0-9]{3,4}$"
+section_validator = r"^[A-Z0-9]{3,5}$"
+
+
 class Course(models.Model):
-    year = models.CharField(max_length=4, validators=[RegexValidator(regex="^\d{4}$")])
+    year = models.CharField(max_length=4, validators=[RegexValidator(regex=year_validator)])
     session = models.CharField(max_length=1, choices=[("W", "Winter"), ("S", "Summer")])
-    subject = models.CharField(max_length=4, validators=[RegexValidator(regex="^[A-Z]{4}$")])
-    number = models.CharField(max_length=5, validators=[RegexValidator(regex="^[A-Z0-9]{3,4}$")])
-    section = models.CharField(max_length=5, validators=[RegexValidator(regex="^[A-Z0-9]{3,5}$")])
+    subject = models.CharField(max_length=4, validators=[RegexValidator(regex=subject_validator)])
+    number = models.CharField(max_length=5, validators=[RegexValidator(regex=number_validator)])
+    section = models.CharField(max_length=5, validators=[RegexValidator(regex=section_validator)])
     last_open = models.DateTimeField(blank=True, null=True, default=None)
 
     def __str__(self):

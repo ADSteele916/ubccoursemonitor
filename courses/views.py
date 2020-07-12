@@ -82,11 +82,12 @@ def courses(request):
                     message = f'You are already monitoring {c} '
                     message += 'for any seat openings.' if ct.restricted else 'for general seat openings.'
                     messages.warning(request, message)
+                return redirect('courses-list')
         else:
             message = 'Sorry! We are still Beta testing and are not ready for public use yet. ' \
                               'Message Alex with your username to get your account approved.'
             messages.warning(request, message)
-        return redirect('courses-list')
+            return redirect('courses-list')
 
     else:
         default_year = str(datetime.now().year) if datetime.now().month >= 3 else str(datetime.now().year - 1)
