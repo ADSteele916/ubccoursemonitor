@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-import ubccoursemonitor.urls
 from .forms import CourseRegisterForm, CourseTupleRegisterForm
 from .models import Course, CourseTuple
 from users.models import Profile
@@ -107,6 +106,5 @@ def context(title=None, **kwargs):
         output['title'] = title
     output['courses_total'] = Course.objects.count()
     output['users_total'] = Profile.objects.count()
-    output['running'] = ubccoursemonitor.urls.monitor.monitor_thread.is_alive()
     output.update(kwargs)
     return output

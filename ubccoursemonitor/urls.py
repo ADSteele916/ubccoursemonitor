@@ -16,13 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from monitor import course_monitor
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('users.urls')),
     path('', include('courses.urls')),
 ]
-
-
-monitor = course_monitor.CourseMonitor()

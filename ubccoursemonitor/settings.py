@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
     'crispy_forms',
     'courses',
     'users',
@@ -129,7 +130,6 @@ if (os.environ.get('UCM_DJANGO_DEBUG_VALUE') != 'True') and (os.environ.get('UCM
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'courses-home'
 LOGIN_URL = 'login'
@@ -140,6 +140,15 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('UCM_DJANGO_EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('UCM_DJANGO_EMAIL_PASS')
+
+# Celery
+CELERY_BROKER_URL = os.environ.get("REDIS_URL")
+CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 if (os.environ.get('UCM_DJANGO_DEBUG_VALUE') != 'True') and (os.environ.get('UCM_DJANGO_DEBUG_VALUE') is not None):
     django_heroku.settings(locals())
