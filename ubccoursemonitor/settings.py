@@ -33,7 +33,7 @@ ADMINS = [(os.environ.get('UCM_DJANGO_ADMIN_NAME'), os.environ.get('UCM_DJANGO_A
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ubccoursemonitor.herokuapp.com', 'ubccoursemonitor.email']
 
-if (os.environ.get('UCM_DJANGO_DEBUG_VALUE') != 'True') and (os.environ.get('UCM_DJANGO_DEBUG_VALUE') is not None):
+if os.environ.get('UCM_DJANGO_USE_SSL', 'False') != 'True':
     SECURE_SSL_REDIRECT = True
 
 # Application definition
