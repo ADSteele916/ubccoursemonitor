@@ -15,6 +15,17 @@ def home(request):
 
 def faq(request):
     faq_elements = {
+        "Why do I need to create an account?":
+            "We made the design decision to use accounts for three main reasons. First, it allows you to easily see "
+            "and change which sections you are currently monitoring at any given time. This way, you won't receive an "
+            "email about a course that you were briefly interested in joining and then forgot about months after the "
+            "fact. Second, it simplifies the process of monitoring multiple sections. Instead of entering and "
+            "confirming your email for every section, you only need to log in. Finally, if someone else nabs the "
+            "opening we just emailed you about, you won't have to come back here and re-add it. You will continue to "
+            "get emails about openings until you remove the course from your profile.",
+        "What information do you store?":
+            "We only store your username, email, and any courses you are currently monitoring. Passwords are "
+            "encrypted using industry-standard practices and cannot be accessed by anyone once set.",
         "Why can't I add any courses?":
             "This site is still in what I would consider to be a closed beta. There are some lingering issues that "
             "I'd like to sort out before releasing it for general use. The site still works, of course, but it does "
@@ -29,6 +40,9 @@ def faq(request):
             "theoretically improve chances of finding a seat opening, I don't want the SSC to think that it's getting "
             "DDoSed and block our IP. Besides, checking a course every minute should be more than enough to catch at "
             "least 90% of seat openings.",
+        "I haven't been receiving any emails even though I know there have been openings in sections I'm monitoring.":
+            "Check your Spam/Junk folder and whitelist notifier@ubccoursemonitor.email to make sure that you receive "
+            "any future notifications.",
         "I got an email but the section was full when I checked.":
             "Unfortunately, someone else like got the open seat before you did. To maximize your chances of getting "
             "into a course that you are monitoring, be sure to check the SSC as soon as you receive an email from us.",

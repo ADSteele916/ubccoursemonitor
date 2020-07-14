@@ -73,11 +73,12 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
                 next_last_open = timezone.now()
 
             try:
-                subject = f"Check the SSC! Opening in {course}!"
-                message = f"There is an opening in {course.subject} {course.number}, " \
-                          f"section {course.section}.\n\n{course.url()}"
+                subject = f"There is an open seat in {course}. Check the SSC."
+                message = f"There is an opening in {course.subject} {course.number}, section " \
+                          f"{course.section}.\n\n{course.url()}\n\nIf you do not want to receive any more emails " \
+                          f"like this, just go to your profile page to unsubscribe."
                 to_addresses = list(map(lambda profile: profile.user.email, to_notify))
-                notification = send_mail(subject, message, settings.EMAIL_HOST_USER, to_addresses)
+                notification = send_mail(subject, message, settings.EMAIL_NOTIFIER_ADDRESS, to_addresses)
             except SMTPException:
                 notification = None
 

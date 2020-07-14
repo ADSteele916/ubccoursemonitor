@@ -135,11 +135,14 @@ LOGIN_REDIRECT_URL = 'courses-home'
 LOGIN_URL = 'login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('UCM_DJANGO_EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('UCM_DJANGO_EMAIL_PASS')
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get('UCM_SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = 'accounts@ubccoursemonitor.email'
+SERVER_EMAIL = 'server@ubccoursemonitor.email'
+EMAIL_NOTIFIER_ADDRESS = 'notifier@ubccoursemonitor.email'
 
 # Celery
 CELERY_BROKER_URL = os.environ.get("REDIS_URL")
