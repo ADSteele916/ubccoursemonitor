@@ -90,4 +90,4 @@ def profile(request):
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(request.user, instance=request.user.profile)
 
-    return render(request, 'users/profile.html', context(title='Procfile', u_form=u_form, p_form=p_form))
+    return render(request, 'users/profile.html', context(title='Profile', u_form=u_form, p_form=p_form))
