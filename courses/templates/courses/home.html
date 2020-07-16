@@ -1,4 +1,15 @@
 {% extends "courses/base.html" %}
 {% block content %}
-    <h1>Homepage</h1>
+    <div class="content-section">
+        <h1>UBC Course Monitor</h1>
+        <p>Welcome to the UBC Course Monitor!</p>
+        <p>
+            This site is dedicated to helping you get into full course sections at the University of British Columbia
+            for free. If you need to get into a full course, just <a href="{% url "register" %}">register</a> for an
+            account and <a href="{% url "courses-list" %}">fill in the details</a> for the section(s) that you want to
+            monitor.
+        </p>
+        <p>Please be sure to read the <a href="{% url "courses-faq" %}">FAQ</a> if you have any questions.</p>
+        <p>Good luck and happy studying!</p>
+    </div>
 {% endblock content %}

@@ -20,7 +20,7 @@ class CourseRegisterForm(forms.ModelForm):
             )
 
     def clean_subject(self):
-        subject = self.cleaned_data['subject']
+        subject = self.cleaned_data['subject'].upper()
         if re.match(subject_validator, subject):
             return subject
         else:
@@ -29,7 +29,7 @@ class CourseRegisterForm(forms.ModelForm):
             )
 
     def clean_number(self):
-        number = self.cleaned_data['number']
+        number = self.cleaned_data['number'].upper()
         if re.match(number_validator, number):
             return number
         else:
@@ -38,7 +38,7 @@ class CourseRegisterForm(forms.ModelForm):
             )
 
     def clean_section(self):
-        section = self.cleaned_data['section']
+        section = self.cleaned_data['section'].upper()
         if re.match(section_validator, section):
             return section
         else:

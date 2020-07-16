@@ -7,7 +7,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 
 
-year_validator = r"^\d{4}$"
+year_validator = r"^20\d{2}$"
 subject_validator = r"^[A-Z]{2,4}$"
 number_validator = r"^[A-Z0-9]{3,4}$"
 section_validator = r"^[A-Z0-9]{3,5}$"

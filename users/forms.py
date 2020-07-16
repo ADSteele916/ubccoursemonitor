@@ -57,7 +57,9 @@ class ProfileUpdateForm(forms.ModelForm):
     courses = forms.ModelMultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         queryset=Profile.objects.all(),
-        required=False
+        required=False,
+        help_text="These are the courses you are monitoring. Untick any courses that you want to stop getting emails "
+                  "about.",
     )
 
     class Meta:

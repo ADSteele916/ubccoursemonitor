@@ -2,7 +2,7 @@
 {% block content %}
     <div class="content-section">
         <h1>FAQ</h1>
-            {% for q, a in faq_elements.items %}
+        {% for q, a in faq_elements.items %}
             <div class="panel panel-default">
                 <div>
                     <h4 class="panel-title">
@@ -14,6 +14,7 @@
                         {{ a }}
                     </div>
                 </div>
+                <hr/>
             </div>
         {% endfor %}
     </div>

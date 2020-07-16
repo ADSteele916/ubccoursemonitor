@@ -158,3 +158,4 @@ if (os.environ.get('UCM_DJANGO_DEBUG_VALUE') != 'True') and (os.environ.get('UCM
 
 OPEN_COURSE_DELAY = datetime.timedelta(hours=24)
 POLL_FREQUENCY = 1.0
+MAX_NON_PREMIUM_SECTIONS = 2

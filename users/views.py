@@ -66,10 +66,16 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
+
             username = form.cleaned_data.get('username')
             messages.success(request, f'Account created for {username}')
+
             new_user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
             login(request, new_user)
+
+            message = "Your account is now good to go! Now click on 'Courses' to start adding sections to monitor."
+            messages.success(request, message)
+
             return redirect('courses-home')
     else:
         form = UserRegisterForm()
