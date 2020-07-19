@@ -1,9 +1,9 @@
-import time
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render
 
 from .forms import CourseRegisterForm, CourseTupleRegisterForm
@@ -81,36 +81,60 @@ def courses(request):
             ct_form = CourseTupleRegisterForm(request.POST)
 
             if c_form.is_valid() and ct_form.is_valid():
-                c, new_c = Course.objects.get_or_create(year=c_form.instance.year,
+                c, new_c = Course.objects.get_or_create(campus=c_form.instance.campus,
+                                                        year=c_form.instance.year,
                                                         session=c_form.instance.session,
                                                         subject=c_form.instance.subject,
                                                         number=c_form.instance.number,
                                                         section=c_form.instance.section)
+                c_name = c.sub_num_sec()
 
                 ct_form.instance.course = c
-
                 ct, new_ct = CourseTuple.objects.get_or_create(course=ct_form.instance.course,
                                                                restricted=ct_form.instance.restricted)
 
+                get_seats = c.get_seats()
+                if new_c:
+                    if get_seats is False:
+                        fail_message = f"We were unable to download {c_name}'s page from the SSC. This could be " \
+                                       f"because of the SSC being down for maintenance or a database update (this " \
+                                       f"usually occurs between in early morning, Pacific time). It could also be " \
+                                       f"caused by high SSC traffic, usually around registration or grade releases. " \
+                                       f"Please try again in a couple hours."
+                        messages.warning(request, fail_message)
+                        c.delete()
+                        return redirect('courses-list')
+                    elif get_seats == "invalid":
+                        invalid_message = f"This section does not appear to exist. Please check your form entry for " \
+                                          f"errors and try again. If the course does, in fact, exist, please contact " \
+                                          f"us at contact@ubccoursemonitor.email."
+                        messages.warning(request, invalid_message)
+                        c.delete()
+                        return redirect('courses-list')
+
                 if ct not in request.user.profile.courses.all():
-                    request.user.profile.courses.add(ct)
-                    message = f'Your are now monitoring {c} '
-                    message += 'for any seat openings.' if ct.restricted else 'for general seat openings.'
-                    messages.success(request, message)
-                    if new_c:
-                        if c.get_seats() is False:
-                            time.sleep(5)
-                            if c.get_seats() is False:
-                                invalid_message = f"It appears that {c} does not have seats listed on its page. This " \
-                                                  f"could be because all the seats are currently reserved for an STT " \
-                                                  f"or it could be because the course you entered is invalid. You " \
-                                                  f"might want to double check the information you entered."
-                                messages.warning(request, invalid_message)
+                    if get_seats == "stt":
+                        stt_message = "The remaining seats in this section appear to only be available through an " \
+                                      "STT. You will be notified if any non-STT seats open up in this section."
+                        messages.warning(request, stt_message)
+                    try:
+                        ct_opposite_restricted = CourseTuple.objects.get(course=ct_form.instance.course,
+                                                                         restricted=(not ct_form.instance.restricted))
+                        if ct_opposite_restricted in request.user.profile.courses.all():
+                            request.user.profile.courses.remove(ct_opposite_restricted)
+                    except ObjectDoesNotExist:
+                        pass
+                    finally:
+                        request.user.profile.courses.add(ct)
+                        message = f'Your are now monitoring {c_name} '
+                        message += 'for any seat openings.' if ct.restricted else 'for general seat openings.'
+                        messages.success(request, message)
                 else:
-                    message = f'You are already monitoring {c} '
+                    message = f'You are already monitoring {c_name} '
                     message += 'for any seat openings.' if ct.restricted else 'for general seat openings.'
                     messages.warning(request, message)
                 return redirect('courses-list')
+
         else:
             message = f"Sorry! Due to limited resources, you can only monitor {settings.MAX_NON_PREMIUM_SECTIONS} " \
                       f"sections at once. We are working on expanding this limit in the future. For now, go to your " \
@@ -120,7 +144,8 @@ def courses(request):
 
     else:
         default_year = str(datetime.now().year) if datetime.now().month >= 3 else str(datetime.now().year - 1)
-        c_form = CourseRegisterForm(initial={'year': default_year})
+        default_session = "W" if datetime.now().month >= 7 or datetime.now().month <= 2 else "S"
+        c_form = CourseRegisterForm(initial={'campus': 'UBC', 'year': default_year, 'session': default_session})
         ct_form = CourseTupleRegisterForm()
 
     user_courses = request.user.profile.courses.all()

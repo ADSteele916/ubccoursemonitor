@@ -34,6 +34,7 @@ def monitor() -> None:
 
 def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
     course = Course.objects.get(pk=course_id)
+    c_name = course.sub_num_sec()
 
     def open_seats(seats: typing.Tuple[int, int, int, int]) -> str:
         if seats[2] != 0:
@@ -47,14 +48,23 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
 
     t = datetime.datetime.now().strftime("%H:%M:%S")
 
-    if get_seats is not False:
+    if get_seats is False:
+        logger.warning(f"{t}: Failed to download SSC page for {c_name}.")
+        return None
+    elif get_seats == "invalid":
+        logger.warning(f"{t}: {c_name} appears to be invalid.")
+        return None
+    elif get_seats == "stt":
+        logger.info(f"{t}: {c_name} only has STT seats available at the moment.")
+        return None
+    else:
         open_seats = open_seats(get_seats)
         if open_seats != "none":
             if open_seats == "general":
-                logger.info(f"{t}: General opening in {course}")
+                logger.info(f"{t}: General opening in {c_name}")
                 to_notify = users.filter(courses__course=course)
             else:
-                logger.info(f"{t}: Restricted opening in {course}.")
+                logger.info(f"{t}: Restricted opening in {c_name}.")
                 to_notify = users.filter(courses__course=course, courses__restricted=True)
 
             staff_in_list = to_notify.filter(user__is_staff=True)
@@ -69,7 +79,7 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
                 next_last_open = timezone.now()
 
             try:
-                subject = f"There is an open seat in {course}. Check the SSC."
+                subject = f"There is an open seat in {c_name}. Check the SSC."
                 message = f"There is an opening in {course.subject} {course.number}, section " \
                           f"{course.section}.\n\n{course.url()}\n\nIf you do not want to receive any more emails " \
                           f"like this, just go to your profile page to unsubscribe."
@@ -103,10 +113,6 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
         else:
             logger.info(f"{t}: No openings in {course}.")
             return None
-    else:
-        logger.info(f"{t}: Failed to check for open seats in {course}. The SSC might be down or the course could be "
-                    f"restricted to an STT.")
-        return None
 
 
 @shared_task

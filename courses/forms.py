@@ -48,7 +48,7 @@ class CourseRegisterForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = ['year', 'session', 'subject', 'number', 'section']
+        fields = ['campus', 'year', 'session', 'subject', 'number', 'section']
 
 
 class CourseTupleRegisterForm(forms.ModelForm):
