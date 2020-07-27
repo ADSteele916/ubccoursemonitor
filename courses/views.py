@@ -98,9 +98,9 @@ def courses(request):
                     if get_seats is False:
                         fail_message = f"We were unable to download {c_name}'s page from the SSC. This could be " \
                                        f"because of the SSC being down for maintenance or a database update (this " \
-                                       f"usually occurs between in early morning, Pacific time). It could also be " \
-                                       f"caused by high SSC traffic, usually around registration or grade releases. " \
-                                       f"Please try again in a couple hours."
+                                       f"usually occurs in the early morning, Pacific time). It could also be caused " \
+                                       f"by high SSC traffic, usually around registration or grade releases. Please " \
+                                       f"try again in a couple hours."
                         messages.warning(request, fail_message)
                         c.delete()
                         return redirect('courses-list')

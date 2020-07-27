@@ -1,5 +1,5 @@
 import re
-import typing
+from typing import Tuple, Union
 
 import requests
 from bs4 import BeautifulSoup
@@ -52,7 +52,7 @@ class Course(models.Model):
         except Exception:
             return None
 
-    def get_seats(self) -> typing.Union[typing.Tuple[int, int, int, int], str,  bool]:
+    def get_seats(self) -> Union[Tuple[int, int, int, int, bool], str,  bool]:
         soup = self.download_ssc()
 
         if soup is not None:
@@ -62,18 +62,29 @@ class Course(models.Model):
                 registered = int(seats[1])
                 general_open = int(seats[2])
                 restricted_open = int(seats[3])
-                return total_open, registered, general_open, restricted_open
+
+                blocked_regex = r"Note: this section is blocked from registration. Check the comments for details or " \
+                                r"contact the department for further details."
+                blocked_string = soup.select("html > body > div.container > div.content.expand > strong")
+
+                if len(blocked_string) > 0 and re.search(blocked_regex, blocked_string[0].text):
+                    blocked = True
+                else:
+                    blocked = False
+
+                return total_open, registered, general_open, restricted_open, blocked
+
             except IndexError:
-                stt_only = r"Note: The remaining seats in this section are only available through a Standard " \
+                stt_regex = r"Note: The remaining seats in this section are only available through a Standard " \
                            r"Timetable \(STT\)"
                 stt_string = soup.select("html > body > div.container > div.content.expand > strong")
-                if len(stt_string) > 0 and re.search(stt_only, stt_string[0].text):
+                if len(stt_string) > 0 and re.search(stt_regex, stt_string[0].text):
                     return "stt"
 
-                no_longer_offered = r"The requested section is either no longer offered at UBC (Vancouver|Okanagan) " \
+                nlo_regex = r"The requested section is either no longer offered at UBC (Vancouver|Okanagan) " \
                                     r"or is not being offered this session."
                 nlo_string = soup.select("html > body > div.container > div.content.expand")
-                if len(nlo_string) > 0 and re.search(no_longer_offered, nlo_string[0].text):
+                if len(nlo_string) > 0 and re.search(nlo_regex, nlo_string[0].text):
                     return "invalid"
 
         return False

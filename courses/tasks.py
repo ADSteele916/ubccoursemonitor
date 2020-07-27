@@ -57,6 +57,8 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
     elif get_seats == "stt":
         logger.info(f"{t}: {c_name} only has STT seats available at the moment.")
         return None
+    elif get_seats[4]:
+        logger.info(f"{t}: {c_name} is currently blocked for registration.")
     else:
         open_seats = open_seats(get_seats)
         if open_seats != "none":
