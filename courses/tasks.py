@@ -29,7 +29,7 @@ def monitor() -> None:
                 if check is not None:
                     course.last_open = check
                     course.save()
-            time.sleep(settings.POLL_FREQUENCY)
+                    time.sleep(settings.POLL_FREQUENCY)
 
 
 def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:

@@ -117,6 +117,11 @@ def courses(request):
                         stt_message = "The remaining seats in this section appear to only be available through an " \
                                       "STT. You will be notified if any non-STT seats open up in this section."
                         messages.warning(request, stt_message)
+                    elif isinstance(get_seats, tuple) and get_seats[4]:
+                        blocked_message = "This section is currently blocked for registration. You will be notified " \
+                                          "if the section is unblocked and there is an opening."
+                        messages.warning(request, blocked_message)
+
                     try:
                         ct_opposite_restricted = CourseTuple.objects.get(course=ct_form.instance.course,
                                                                          restricted=(not ct_form.instance.restricted))
@@ -161,14 +166,14 @@ def context(title=None, **kwargs):
     if title is not None:
         output['title'] = title
 
-    users = Profile.objects.all().exclude(courses=None)
+    users = Profile.objects.all()
     courses_list = []
     for course in Course.objects.all():
         if users.filter(courses__course=course).count() > 0:
             courses_list.append(course)
     if len(courses_list) > 0:
         output['courses_total'] = len(courses_list)
-        output['users_total'] = users.count()
+        output['users_total'] = Profile.objects.count()
 
     output.update(kwargs)
 
