@@ -45,7 +45,7 @@ def faq(request):
             "Check your Spam/Junk folder and whitelist notifier@ubccoursemonitor.email to make sure that you receive "
             "any future notifications.",
         "I got an email but the section was full when I checked.":
-            "Unfortunately, someone else like got the open seat before you did. To maximize your chances of getting "
+            "Unfortunately, someone else likely got the open seat before you did. To maximize your chances of getting "
             "into a section that you are monitoring, be sure to check the SSC as soon as you receive an email from us.",
         "I didn't act fast enough after receiving an email. Do I need to add the section again?":
             "No, you don't. After an email is sent out for a section, there will be a brief cooldown period of about "
