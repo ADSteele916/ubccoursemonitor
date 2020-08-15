@@ -2,34 +2,40 @@ import re
 
 from django import forms
 
-from .models import Course, CourseTuple, year_validator, subject_validator, number_validator, section_validator
+from .models import (
+    Course,
+    CourseTuple,
+    year_validator,
+    subject_validator,
+    number_validator,
+    section_validator,
+)
 
 
 class CourseRegisterForm(forms.ModelForm):
-
     def clean(self):
         return self.cleaned_data
 
     def clean_year(self):
-        year = self.cleaned_data['year']
+        year = self.cleaned_data["year"]
         if re.match(year_validator, year):
             return year
         else:
             raise forms.ValidationError(
-                'Please enter the year of the session of the course you are monitoring (e.g. 2020W)'
+                "Please enter the year of the session of the course you are monitoring (e.g. 2020)"
             )
 
     def clean_subject(self):
-        subject = self.cleaned_data['subject'].upper()
+        subject = self.cleaned_data["subject"].upper()
         if re.match(subject_validator, subject):
             return subject
         else:
             raise forms.ValidationError(
-                'Please enter the subject of the course you are monitoring (e.g. PHYS)'
+                "Please enter the subject of the course you are monitoring (e.g. PHYS)"
             )
 
     def clean_number(self):
-        number = self.cleaned_data['number'].upper()
+        number = self.cleaned_data["number"].upper()
         if re.match(number_validator, number):
             return number
         else:
@@ -38,7 +44,7 @@ class CourseRegisterForm(forms.ModelForm):
             )
 
     def clean_section(self):
-        section = self.cleaned_data['section'].upper()
+        section = self.cleaned_data["section"].upper()
         if re.match(section_validator, section):
             return section
         else:
@@ -48,18 +54,17 @@ class CourseRegisterForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = ['campus', 'year', 'session', 'subject', 'number', 'section']
+        fields = ["campus", "year", "session", "subject", "number", "section"]
 
 
 class CourseTupleRegisterForm(forms.ModelForm):
-
     def clean(self):
         return self.cleaned_data
 
     class Meta:
         model = CourseTuple
-        fields = ['restricted']
+        fields = ["restricted"]
         labels = {
-            'restricted': 'Monitor for all seat openings (including restricted ones). Leave unchecked for general '
-                          'seats only.',
+            "restricted": "Monitor for all seat openings (including restricted ones). Leave unchecked for general "
+            "seats only.",
         }

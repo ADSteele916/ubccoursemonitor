@@ -23,7 +23,15 @@ def monitor() -> None:
     users = Profile.objects.all()
     for course in Course.objects.all():
         if users.filter(courses__course=course).count() > 0:
-            if course.last_open is None or course.last_open + settings.OPEN_COURSE_DELAY < timezone.now():
+            course_users = users.filter(courses__course=course)
+            if (
+                course.last_open is None
+                or course.last_open + settings.OPEN_COURSE_DELAY < timezone.now()
+            ) and (
+                settings.NON_PREMIUM_NOTIFICATIONS
+                or (course_users.filter(user__is_staff=True).count() > 0)
+                or (course_users.filter(is_premium=True).count() > 0)
+            ):
                 course_id = course.pk
                 check = check_course(course_id, users)
                 if check is not None:
@@ -67,14 +75,16 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
                 to_notify = users.filter(courses__course=course)
             else:
                 logger.info(f"{t}: Restricted opening in {c_name}.")
-                to_notify = users.filter(courses__course=course, courses__restricted=True)
+                to_notify = users.filter(
+                    courses__course=course, courses__restricted=True
+                )
 
             staff_in_list = to_notify.filter(user__is_staff=True)
             premium_in_list = to_notify.filter(is_premium=True)
             if staff_in_list.count() > 0:
                 to_notify = staff_in_list
                 next_last_open = timezone.now() - (settings.OPEN_COURSE_DELAY * 3 / 4)
-            elif premium_in_list.count() > 0:
+            elif premium_in_list.count() > 0 or settings.NON_PREMIUM_NOTIFICATIONS:
                 to_notify = premium_in_list
                 next_last_open = timezone.now() - (settings.OPEN_COURSE_DELAY / 2)
             else:
@@ -82,11 +92,15 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
 
             try:
                 subject = f"There is an open seat in {c_name}. Check the SSC."
-                message = f"There is an opening in {course.subject} {course.number}, section " \
-                          f"{course.section}.\n\n{course.url()}\n\nIf you do not want to receive any more emails " \
-                          f"like this, just go to your profile page to unsubscribe."
+                message = (
+                    f"There is an opening in {course.subject} {course.number}, section "
+                    f"{course.section}.\n\n{course.url()}\n\nIf you do not want to receive any more emails "
+                    f"like this, just go to your profile page to unsubscribe."
+                )
                 to_addresses = list(map(lambda profile: profile.user.email, to_notify))
-                notification = send_mail(subject, message, settings.EMAIL_NOTIFIER_ADDRESS, to_addresses)
+                notification = send_mail(
+                    subject, message, settings.EMAIL_NOTIFIER_ADDRESS, to_addresses
+                )
             except SMTPException:
                 notification = None
 
@@ -98,16 +112,20 @@ def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
                 recipients = str(to_notify[0]) + " and " + str(to_notify[1])
             else:
                 recipients = ""
-                for user in to_notify[:(len(to_notify) - 1)]:
+                for user in to_notify[: (len(to_notify) - 1)]:
                     recipients = recipients + str(user) + ", "
                 recipients = recipients + "and " + str(to_notify[-1])
 
             if notification is not None and notification > 0:
                 logger.info(f"{t}: Sent email about {course} to {recipients}.")
             elif notification is None:
-                logger.info(f"{t}: Failed to send email about {course} to {recipients}.")
+                logger.info(
+                    f"{t}: Failed to send email about {course} to {recipients}."
+                )
             else:
-                logger.info(f"{t}: No users are monitoring {course} for {open_seats} seats.")
+                logger.info(
+                    f"{t}: No users are monitoring {course} for {open_seats} seats."
+                )
                 return None
 
             return next_last_open

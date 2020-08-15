@@ -10,4 +10,4 @@ class CourseTupleInline(admin.StackedInline):
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     inlines = [CourseTupleInline]
-    list_display = ('__str__', 'is_premium', 'number_of_courses')
+    list_display = ("__str__", "is_premium", "number_of_courses")

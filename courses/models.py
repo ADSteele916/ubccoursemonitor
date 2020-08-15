@@ -20,11 +20,19 @@ class Course(models.Model):
         choices=[("UBC", "UBC Vancouver"), ("UBCO", "UBC Okanagan")],
         default="UBC",
     )
-    year = models.CharField(max_length=4, validators=[RegexValidator(regex=year_validator)])
+    year = models.CharField(
+        max_length=4, validators=[RegexValidator(regex=year_validator)]
+    )
     session = models.CharField(max_length=1, choices=[("W", "Winter"), ("S", "Summer")])
-    subject = models.CharField(max_length=4, validators=[RegexValidator(regex=subject_validator)])
-    number = models.CharField(max_length=5, validators=[RegexValidator(regex=number_validator)])
-    section = models.CharField(max_length=5, validators=[RegexValidator(regex=section_validator)])
+    subject = models.CharField(
+        max_length=4, validators=[RegexValidator(regex=subject_validator)]
+    )
+    number = models.CharField(
+        max_length=5, validators=[RegexValidator(regex=number_validator)]
+    )
+    section = models.CharField(
+        max_length=5, validators=[RegexValidator(regex=section_validator)]
+    )
     last_open = models.DateTimeField(blank=True, null=True, default=None)
 
     def __str__(self) -> str:
@@ -38,36 +46,48 @@ class Course(models.Model):
         return f"{self.subject} {self.number} {self.section}"
 
     def url(self) -> str:
-        return f"https://courses.students.ubc.ca/cs/courseschedule?pname=subjarea&tname=subj-section&campuscd=" \
-               f"{self.campus}&sessyr={self.year}&sesscd={self.session}&dept={self.subject}&course={self.number}" \
-               f"&section={self.section}"
+        return (
+            f"https://courses.students.ubc.ca/cs/courseschedule?pname=subjarea&tname=subj-section&campuscd="
+            f"{self.campus}&sessyr={self.year}&sesscd={self.session}&dept={self.subject}&course={self.number}"
+            f"&section={self.section}"
+        )
 
     def download_ssc(self) -> BeautifulSoup or None:
         """Downloads the course's SSC page and returns its HTML content."""
-        headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, "
-                                 "like Gecko) Chrome/39.0.2171.95 Safari/537.36"}
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, "
+            "like Gecko) Chrome/39.0.2171.95 Safari/537.36"
+        }
         try:
             response = requests.get(self.url(), headers=headers)
             return BeautifulSoup(response.text, "html.parser")
         except Exception:
             return None
 
-    def get_seats(self) -> Union[Tuple[int, int, int, int, bool], str,  bool]:
+    def get_seats(self) -> Union[Tuple[int, int, int, int, bool], str, bool]:
         soup = self.download_ssc()
 
         if soup is not None:
             try:
-                seats = list(map(lambda i: i.text, soup.select("table > tr > td > strong")))
+                seats = list(
+                    map(lambda i: i.text, soup.select("table > tr > td > strong"))
+                )
                 total_open = int(seats[0])
                 registered = int(seats[1])
                 general_open = int(seats[2])
                 restricted_open = int(seats[3])
 
-                blocked_regex = r"Note: this section is blocked from registration. Check the comments for details or " \
-                                r"contact the department for further details."
-                blocked_string = soup.select("html > body > div.container > div.content.expand > strong")
+                blocked_regex = (
+                    r"Note: this section is blocked from registration. Check the comments for details or "
+                    r"contact the department for further details."
+                )
+                blocked_string = soup.select(
+                    "html > body > div.container > div.content.expand > strong"
+                )
 
-                if len(blocked_string) > 0 and re.search(blocked_regex, blocked_string[0].text):
+                if len(blocked_string) > 0 and re.search(
+                    blocked_regex, blocked_string[0].text
+                ):
                     blocked = True
                 else:
                     blocked = False
@@ -75,15 +95,23 @@ class Course(models.Model):
                 return total_open, registered, general_open, restricted_open, blocked
 
             except IndexError:
-                stt_regex = r"Note: The remaining seats in this section are only available through a Standard " \
-                           r"Timetable \(STT\)"
-                stt_string = soup.select("html > body > div.container > div.content.expand > strong")
+                stt_regex = (
+                    r"Note: The remaining seats in this section are only available through a Standard "
+                    r"Timetable \(STT\)"
+                )
+                stt_string = soup.select(
+                    "html > body > div.container > div.content.expand > strong"
+                )
                 if len(stt_string) > 0 and re.search(stt_regex, stt_string[0].text):
                     return "stt"
 
-                nlo_regex = r"The requested section is either no longer offered at UBC (Vancouver|Okanagan) " \
-                                    r"or is not being offered this session."
-                nlo_string = soup.select("html > body > div.container > div.content.expand")
+                nlo_regex = (
+                    r"The requested section is either no longer offered at UBC (Vancouver|Okanagan) "
+                    r"or is not being offered this session."
+                )
+                nlo_string = soup.select(
+                    "html > body > div.container > div.content.expand"
+                )
                 if len(nlo_string) > 0 and re.search(nlo_regex, nlo_string[0].text):
                     return "invalid"
 

@@ -62,10 +62,17 @@
         <div class="col-md-4">
             {% if courses_total %}
                 <div class="content-section">
-                    <h3>Status: Active</h3>
-                    <p class='text-muted'>
-                        Currently monitoring {{ courses_total }} {% if courses_total == 1 %}section{% else %}sections{% endif %} for {{ users_total }} {% if users_total == 1 %}student{% else %}students{% endif %}!
-                    </p>
+                    {% if active %}
+                        <h3>Status: Active</h3>
+                        <p class="text-muted">
+                            Currently monitoring {{ courses_total }} {% if courses_total == 1 %}section{% else %}sections{% endif %} for {{ users_total }} {% if users_total == 1 %}student{% else %}students{% endif %}!
+                        </p>
+                    {% else %}
+                        <h3>Status: Down</h3>
+                        <p class="text-muted">
+                            The service is currently down. It is either undergoing maintenance or is disabled.
+                        </p>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
