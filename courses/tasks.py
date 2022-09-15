@@ -1,4 +1,5 @@
 import datetime
+import random
 import time
 import typing
 from smtplib import SMTPException
@@ -21,7 +22,9 @@ logger = get_task_logger(__name__)
 @shared_task
 def monitor() -> None:
     users = Profile.objects.all()
-    for course in Course.objects.all():
+    courses = list(Course.objects.all())
+    random.shuffle(courses)
+    for course in courses:
         if users.filter(courses__course=course).count() > 0:
             course_users = users.filter(courses__course=course)
             if (
@@ -37,7 +40,7 @@ def monitor() -> None:
                 if check is not None:
                     course.last_open = check
                     course.save()
-                time.sleep(settings.POLL_FREQUENCY)
+                time.sleep(settings.POLL_FREQUENCY * (random.uniform(0.5, 1.5)))
 
 
 def check_course(course_id: int, users: QuerySet) -> datetime.datetime or None:
