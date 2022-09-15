@@ -161,7 +161,7 @@ if (os.environ.get("UCM_DJANGO_DEBUG_VALUE") != "True") and (
     django_heroku.settings(locals())
 
 OPEN_COURSE_DELAY = datetime.timedelta(hours=24)
-POLL_FREQUENCY = 1.0
+POLL_FREQUENCY = int(os.environ.get("UCM_POLL_FREQUENCY", "1"))
 MAX_NON_PREMIUM_SECTIONS = 2
 
 NON_PREMIUM_NOTIFICATIONS = (
